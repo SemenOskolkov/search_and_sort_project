@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "course-project-2"
+version = "0.1.0"
+description = ""
+authors = ["Semen Oskolkov <oskolkovsemen@yandex.ru>"]
+readme = "README.md"
+packages = [{include = "course_project_2"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.scripts]
+get-sorted = 'course_project_2.sort:main'
+get-banch = 'course_project_2.get_by_date:main'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
