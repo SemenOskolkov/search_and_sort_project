@@ -10,9 +10,6 @@ def cache(func):
                 read = csv.DictReader(file)
                 result = [*read]
 
-            with open(data/filename, 'w', newline='') as write_file:  # Передает содержимое из файла с кэшем в назначенный файл
-                write_file.writelines(result)
-
         else:
             result = func(*args, **kwargs)
 
