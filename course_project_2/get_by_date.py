@@ -5,6 +5,8 @@ import os
 def cache(func):
     def wrapper(*args, **kwargs):
         cache_name = ''.join([str(i) for i in [*args]]) + ''.join([str(i) for i in kwargs.values()][:-1])
+        if not os.path.exists('cache'):
+            os.mkdir('cache')
         if os.path.exists(f'cache/{cache_name}.csv'):
             with open(f'cache/{cache_name}.csv', 'r', newline='') as file:  # Открывает файл по названию
                 read = csv.DictReader(file)
@@ -13,8 +15,10 @@ def cache(func):
         else:
             result = func(*args, **kwargs)
 
-            with open(f'cache/{cache_name}.csv', 'w') as file:  # Записывает результат в кэш
-                file.writelines(result)
+            with open(f'cache/{cache_name}.csv', 'w', newline='') as file:  # Записывает результат в кэш
+                writer = csv.writer(file, delimiter='|')
+                for item in result:
+                    writer.writerow(item.values())
 
         return result
 
@@ -117,7 +121,7 @@ def get_by_date(date=None, name=None, filename=None):
 
             find_info = [list_with_data[index_name]]  # Список из запрошенной даты и имени
 
-        with open(data/filename, 'w', newline='') as write_file:  # Запись результата поиска в файл
+        with open(f'data/{filename}', 'w', newline='') as write_file:  # Запись результата поиска в файл
             writer = csv.writer(write_file, delimiter='|')
             for item in find_info:
                 writer.writerow(item.values())
