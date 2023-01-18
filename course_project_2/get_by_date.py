@@ -15,14 +15,51 @@ def cache(func):
         else:
             result = func(*args, **kwargs)
 
-            with open(f'cache/{cache_name}.csv', 'w', newline='') as file:  # Записывает результат в кэш
-                writer = csv.writer(file, delimiter='|')
-                for item in result:
-                    writer.writerow(item.values())
+            with open(f'cache/{cache_name}.csv', 'w') as file:  # Записывает результат в кэш
+                            file.writelines(result)
 
         return result
 
     return wrapper
+
+
+@cache
+def get_by_date(date=None, name=None, filename=None):
+    with open('data/all_stocks_5yr.csv', encoding='utf-8') as file:  # Чтение отсортированного файла по дате (от меньшего к большему)
+        read = csv.DictReader(file)
+        list_data = []
+        for items in read:
+            list_data.append(items)
+
+            if date == 'all':
+                dict_key = 'Name'
+
+                list_data.sort(key=lambda name: name['Name'])  # Сортируем список по имени
+
+                index_first = binary_search_iterative_first(list_data, name, dict_key)  # Индекс первого вхождения в список, передаем список и имя
+                index_last = binary_search_iterative_last(list_data, name, dict_key)  # Индекс последнего вхождения в список, передаем список и имя
+                find_info = list_data[index_first:index_last]  # Выводим срез по имени и передаем в результат
+
+            elif name == 'all':
+                dict_key = 'date'
+
+                list_data.sort(key=lambda data: data['date'])  # Сортируем список по дате
+
+                index_first = binary_search_iterative_first(list_data, date, dict_key)  # Индекс первого вхождения в список, передаем список и дату
+                index_last = binary_search_iterative_last(list_data, date, dict_key)  # Индекс последнего вхождения в список, передаем список и дату
+                find_info = list_data[index_first:index_last]  # Выводим срез по дате и передаем в результат
+            else:
+                dict_key = 'date'
+
+                list_data.sort(key=lambda data: data['date'])  #
+
+                index_first = binary_search_iterative_first(list_data, date, dict_key)  # Индекс первого вхождения в список, передаем список и дату
+                index_last = binary_search_iterative_last(list_data, date, dict_key)  # Индекс последнего вхождения в список, передаем список и дату
+                list_with_data = list_data[index_first:index_last]  # Строка из словарей по дате из найденных индексов
+                
+                index_name = LinearSearch(list_with_data, name)  # Индекс значения по имени, передаем строку из словарей и имя
+
+                find_info = [list_with_data[index_name]]  # Список из запрошенной даты и имени
 
 
 def binary_search_iterative_first(array,
@@ -72,7 +109,6 @@ def LinearSearch(array, element):  # РАБОТАЕТ Линейный поис�
     return -1
 
 
-@cache
 def get_by_date(date=None, name=None, filename=None):
     with open('data/all_stocks_5yr.csv',
               encoding='utf-8') as file:  # Чтение отсортированного файла по дате (от меньшего к большему)
