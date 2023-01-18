@@ -15,14 +15,25 @@ def cache(func):
         else:
             result = func(*args, **kwargs)
 
-            with open(f'cache/{cache_name}.csv', 'w', newline='') as file:  # Записывает результат в кэш
-                writer = csv.writer(file, delimiter='|')
-                for item in result:
-                    writer.writerow(item.values())
+            with open(f'cache/{cache_name}.csv', 'w') as file:  # Записывает результат в кэш
+                file.writelines(result)
 
         return result
 
     return wrapper
+
+
+@cache
+def select_sorted(sort_columns=None, limit=None, order=None, filename=None):  # Функция для кэша
+    with open('data/all_stocks_5yr.csv', encoding='utf-8') as file:  # Чтение файла
+        read = csv.DictReader(file)
+        list_data = []
+        for items in read:
+            if items[sort_columns[0]] != '':  # Проверка на пустые значения и добавление не пустых в список
+                list_data.append(items)
+        quick_sort(list_data, sort_columns[0])  # Сортировка методом "быстрой сортировки"
+        if order == "desc":  # Реверсия значений по ключу high от большего к меньшему
+            list_data.reverse()
 
 
 def partition(nums, low, high, sort_column):
@@ -60,7 +71,6 @@ def quick_sort(nums, sort_column):
     _quick_sort(nums, 0, len(nums) - 1, sort_column)
 
 
-@cache
 def select_sorted(sort_columns=None, limit=None, order=None, filename=None):
     with open('data/all_stocks_5yr.csv', encoding='utf-8') as file:  # Чтение файла
         read = csv.DictReader(file)
