@@ -113,6 +113,5 @@ name_file = input(f'Название файла для сохранения ре
 
 select_sorted(sort_columns=column, order=oder_direction, limit=limit_data, filename=name_file)
 
-
 if __name__ == '__main__':
     main()
