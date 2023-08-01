@@ -1,17 +1,16 @@
 [tool.poetry]
-name = "course-project-2"
+name = "algorithms"
 version = "0.1.0"
 description = ""
 authors = ["Semen Oskolkov <oskolkovsemen@yandex.ru>"]
 readme = "README.md"
-packages = [{include = "course_project_2"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
 [tool.poetry.scripts]
-get-sorted = 'course_project_2.sort:main'
-get-banch = 'course_project_2.get_by_date:main'
+sort = 'algorithms.sort:main'
+search = 'algorithms.get_by_date:main'
 
 
 [build-system]
