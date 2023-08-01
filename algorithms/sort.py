@@ -1,39 +1,6 @@
 import csv
-import os
 
-
-def cache(func):
-    def wrapper(*args, **kwargs):
-        cache_name = ''.join([str(i) for i in [*args]]) + ''.join([str(i) for i in kwargs.values()][:-1])
-        if not os.path.exists('cache'):
-            os.mkdir('cache')
-        if os.path.exists(f'cache/{cache_name}.csv'):
-            with open(f'cache/{cache_name}.csv', 'r', newline='') as file:  # Открывает файл по названию
-                read = csv.DictReader(file)
-                result = [*read]
-
-        else:
-            result = func(*args, **kwargs)
-
-            with open(f'cache/{cache_name}.csv', 'w') as file:  # Записывает результат в кэш
-                file.writelines(result)
-
-        return result
-
-    return wrapper
-
-
-@cache
-def select_sorted(sort_columns=None, limit=None, order=None, filename=None):  # Функция для кэша
-    with open('data/all_stocks_5yr.csv', encoding='utf-8') as file:  # Чтение файла
-        read = csv.DictReader(file)
-        list_data = []
-        for items in read:
-            if items[sort_columns[0]] != '':  # Проверка на пустые значения и добавление не пустых в список
-                list_data.append(items)
-        quick_sort(list_data, sort_columns[0])  # Сортировка методом "быстрой сортировки"
-        if order == "desc":  # Реверсия значений по ключу high от большего к меньшему
-            list_data.reverse()
+from cache.cache import sort_cache
 
 
 def partition(nums, low, high, sort_column):
@@ -70,7 +37,10 @@ def quick_sort(nums, sort_column):
 
     _quick_sort(nums, 0, len(nums) - 1, sort_column)
 
+    return nums
 
+
+@sort_cache
 def select_sorted(sort_columns=None, limit=None, order=None, filename=None):
     with open('data/all_stocks_5yr.csv', encoding='utf-8') as file:  # Чтение файла
         read = csv.DictReader(file)
@@ -82,10 +52,12 @@ def select_sorted(sort_columns=None, limit=None, order=None, filename=None):
         if order == "desc":  # Реверсия значений по ключу high от большего к меньшему
             list_data.reverse()
 
-    with open(f'data/{filename}', 'w', newline='') as write_file:  # Запись отсортированных данных в новый файл
+    with open(f'result/{filename}', 'w', newline='') as write_file:  # Запись отсортированных данных в новый файл
         writer = csv.writer(write_file, delimiter='|')
         for item in list_data[:limit]:
             writer.writerow(item.values())
+
+    return list_data
 
 
 sort_by_price = int(
@@ -109,7 +81,7 @@ if oder == 2:
 
 limit_data = int(input(f'Ограничение выборки [10]:') or 10)
 
-name_file = input(f'Название файла для сохранения результата [dump.csv]: ') or 'dump.csv'
+name_file = input(f'Название файла для сохранения результата [sort_result.csv]: ') or 'sort_result.csv'
 
 select_sorted(sort_columns=column, order=oder_direction, limit=limit_data, filename=name_file)
 
